@@ -18,11 +18,11 @@
 ;;----------------------------------------------------------------------------
 ;; Adjust garbage collection thresholds during startup, and thereafter
 ;;----------------------------------------------------------------------------
-;; (let ((normal-gc-cons-threshold (* 20 1024 1024))
-;; 	  (init-gc-cons-threshold (* 128 1024 1024)))
-;;   (setq gc-cons-threshold init-gc-cons-threshold)
-;;   (add-hook 'emacs-startup-hook
-;; 			(lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+(setq normal-gc-cons-threshold (* 20 1024 1024))
+(let ((init-gc-cons-threshold (* 128 1024 1024)))
+  (setq gc-cons-threshold init-gc-cons-threshold)
+  (add-hook 'emacs-startup-hook
+			(lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
 
 ;; Bootstrap config
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -190,8 +190,8 @@
 ;; (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
 
 ;; set theme
-(add-to-list 'load-path "/Users/pavin/.emacs.d/themes")
-(add-to-list 'custom-theme-load-path "/Users/pavin/.emacs.d/themes")
+(add-to-list 'load-path (expand-file-name "themes" user-emacs-directory))
+(add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
 (load-theme 'monokai-pro t)
 
 (provide 'init)
@@ -202,11 +202,9 @@
  ;; if there is more than one, they won't work right.
  '(custom-safe-themes
    '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "14850c68376012a083ed7ec9d36179962b165cd8f7536f021ee3b6f5cb68aa3c" "3a2f8087795a6a06d5a57cec6569dbbb98211f86ae3ad9ce931a5a3340b32569" default))
- '(evil-default-state 'emacs)
  '(line-number-mode t)
  '(package-selected-packages
    '(auto-complete flycheck-rust rust-mode sml-mode projectile org magit slime flycheck avy rainbow-delimiters multiple-cursors))
- '(python-shell-interpreter "/users/pavin/miniconda3/bin/python3")
  '(sml/no-confirm-load-theme t))
 (custom-set-faces
  ;; custom-set-faces was added by custom.
@@ -216,10 +214,6 @@
  '(default ((t (:inherit nil :stipple nil :background "#2d2a2e" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "nil" :family "monaco"))))
  '(company-tooltip-selection ((t (:background "brightwhite"))))
  '(font-lock-variable-name-face ((t (:foreground "color-153"))))
- '(helm-buffer-file ((t (:foreground "yellow"))))
- '(helm-ff-directory ((t (:foreground "green"))))
- '(helm-ff-file ((t (:foreground "brightblue" :weight bold))))
- '(helm-selection ((t (:background "color-239"))))
  '(hl-line ((t (:background "#3d3d3d"))))
  '(lsp-ui-doc-background ((t (:background "color-239"))))
  '(magit-diff-added-highlight ((t (:background "#339078" :foreground "#ffffff"))))
