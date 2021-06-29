@@ -91,11 +91,16 @@
   (setq flycheck-clang-language-standard "c++11")
   :ensure t)
 
+(use-package yasnippet
+  :ensure t
+  :init
+  (yas-global-mode))
+
 (use-package projectile
-  :init (use-package counsel-projectile
+  :init
+  (use-package counsel-projectile
 		  :ensure t
 		  :config (counsel-projectile-mode))
-  :config (setq projectile-completion-system 'helm)
   :bind (("C-c p" . projectile-command-map))
   :ensure t)
 
@@ -111,7 +116,7 @@
 		lsp-prefer-flymake nil)
   :hook ((c-mode . lsp)
 		 (c++-mode . lsp)
-		 (python-mode . lsp-defered)
+		 (python-mode . lsp)
 		 (rust-mode . lsp)
 		 ;; if you want which-key integration
 		 (lsp-mode . lsp-enable-which-key-integration))
@@ -130,12 +135,7 @@
 
 (use-package rust-mode
   :ensure t
-  :init
-  (use-package flycheck-rust
-	:ensure t
-	:hook (flycheck-mode-hook . flycheck-rust-setup))
-  :bind ("C-c C-c" . rust-run)
-  )
+  :bind ("C-c C-c" . rust-run))
 
 ;; Add keybindings for interacting with Cargo
 (use-package cargo
@@ -176,9 +176,24 @@
   :init
   (global-undo-tree-mode))
 
+(use-package dashboard
+  :ensure t
+  :diminish dashboard-mode
+  :config
+  (setq dashboard-banner-logo-title "Coding is happening")
+  (setq dashboard-projects-backend 'projectile)
+  ;; (setq dashboard-startup-banner "/path/to/image")
+  (setq dashboard-items '((recents  . 5)
+						  (bookmarks . 5)
+						  (projects . 10)))
+      (dashboard-setup-startup-hook))
+
 ;; sml-mode -- smart mode line
-(setq sml/no-confirm-load-theme t)  ; avoid asking when startup
-(sml/setup)
+(use-package smart-mode-line
+  :ensure t
+  :config
+  (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
+  (sml/setup))
 
 ;; SSH remote
 ;; (defun connect-homeserver ()
@@ -194,35 +209,10 @@
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
 (load-theme 'monokai-pro t)
 
+;; Variables configured via the interactive 'customize' interface
+(when (file-exists-p custom-file)
+  (load custom-file))
+
 (provide 'init)
-(custom-set-variables
- ;; custom-set-variables was added by custom.
- ;; if you edit it by hand, you could mess it up, so be careful.
- ;; your init file should contain only one such instance.
- ;; if there is more than one, they won't work right.
- '(custom-safe-themes
-   '("a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "14850c68376012a083ed7ec9d36179962b165cd8f7536f021ee3b6f5cb68aa3c" "3a2f8087795a6a06d5a57cec6569dbbb98211f86ae3ad9ce931a5a3340b32569" default))
- '(line-number-mode t)
- '(package-selected-packages
-   '(auto-complete flycheck-rust rust-mode sml-mode projectile org magit slime flycheck avy rainbow-delimiters multiple-cursors))
- '(sml/no-confirm-load-theme t))
-(custom-set-faces
- ;; custom-set-faces was added by custom.
- ;; if you edit it by hand, you could mess it up, so be careful.
- ;; your init file should contain only one such instance.
- ;; if there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "#2d2a2e" :foreground "white" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 120 :width normal :foundry "nil" :family "monaco"))))
- '(company-tooltip-selection ((t (:background "brightwhite"))))
- '(font-lock-variable-name-face ((t (:foreground "color-153"))))
- '(hl-line ((t (:background "#3d3d3d"))))
- '(lsp-ui-doc-background ((t (:background "color-239"))))
- '(magit-diff-added-highlight ((t (:background "#339078" :foreground "#ffffff"))))
- '(magit-diff-removed-highlight ((t (:background "#9e7187" :foreground "#eecccc"))))
- '(mode-line ((t (:background "brightblack" :foreground "#939293"))))
- '(mode-line-buffer-id ((t (:background "brightblack" :weight bold))))
- '(mode-line-inactive ((t (:background "black" :foreground "grey20" :inverse-video nil))))
- '(rainbow-delimiters-depth-2-face ((t (:inherit rainbow-delimiters-base-face :foreground "brightmagenta"))))
- '(rainbow-delimiters-depth-3-face ((t (:inherit rainbow-delimiters-base-face :foreground "brightgreen"))))
- '(sml/filename ((t (:inherit sml/global :foreground "yellow" :weight bold)))))
 
 ;;; init.el ends here
