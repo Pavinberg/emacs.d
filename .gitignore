@@ -2,7 +2,6 @@
 /session.*
 \#*
 *~
-/custom.el
 /ac-comphist.dat
 /bookmarks
 /.bookmarks.el

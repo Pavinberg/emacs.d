@@ -15,6 +15,7 @@
 (add-hook 'prog-mode-hook #'show-paren-mode)
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
+(menu-bar-mode -1)
 ;; (add-hook 'rust-mode-hook
 ;; 		  (lambda () (setq indent-tabs-mode nil)))
 

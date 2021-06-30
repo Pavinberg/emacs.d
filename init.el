@@ -121,6 +121,7 @@
 		 ;; if you want which-key integration
 		 (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
+  :custom (lsp-headerline-breadcrumb-enable t)
   :ensure t)
 
 (use-package lsp-ui
