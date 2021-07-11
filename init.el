@@ -25,7 +25,6 @@
 			(lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
 
 ;; Bootstrap config
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (require 'init-utils)
 (require 'init-site-lisp) ;; Must come before elpa, as it may provide package.el
 ;; Calls (package-initialize)
@@ -34,11 +33,14 @@
 
 ;; Allow users to provide an optional "init-preload-local.el"
 (require 'init-preload-local nil t)
+(require 'init-themes)
 
 (eval-when-compile
   ;; Following line is not needed if use-package.el is in ~/.emacs.d
   (add-to-list 'load-path "elpa/use-package-2.4.1/")
   (require 'use-package))
+
+(require 'init-latex)
 
 ;; ===========================================
 ;; Basic Customization (in init-preload-local)
@@ -84,11 +86,10 @@
   :ensure t)
 
 (use-package flycheck
-  :init (global-flycheck-mode)
+  ;; :init (global-flycheck-mode)
   :hook
   (prog-mode . flycheck-mode)
-  :config
-  (setq flycheck-clang-language-standard "c++11")
+  (c++-mode-hook . (lambda () (setq flycheck-clang-language-standard "c++11")))
   :ensure t)
 
 (use-package yasnippet
@@ -97,23 +98,26 @@
   (yas-global-mode))
 
 (use-package projectile
-  :init
-  (use-package counsel-projectile
-		  :ensure t
-		  :config (counsel-projectile-mode))
   :bind (("C-c p" . projectile-command-map))
   :ensure t)
 
+(use-package counsel-projectile
+  :ensure t
+  :after (projectile)
+  :config (counsel-projectile-mode))
+
 ;; slime
 (setq inferior-lisp-program "sbcl")
+
+(use-package all-the-icons)
 
 ;; lisp-mode
 (use-package lsp-mode
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l"
-		lsp-file-watch-threshold 500
-		lsp-prefer-flymake nil)
+		lsp-file-watch-threshold 500)
+		;; lsp-prefer-flymake nil)
   :hook ((c-mode . lsp)
 		 (c++-mode . lsp)
 		 (python-mode . lsp)
@@ -134,6 +138,26 @@
   :ensure t
   :after (lsp-mode))
 
+(use-package treemacs
+  :ensure t
+  :defer t
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t B"   . treemacs-bookmark)
+        ;; ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package lsp-treemacs
+  :after (treemacs lsp)
+  :ensure t)
+
 (use-package rust-mode
   :ensure t
   :bind ("C-c C-c" . rust-run))
@@ -149,7 +173,8 @@
 
 (use-package highlight-symbol
   :ensure t
-  :init (highlight-symbol-mode))
+  :init (highlight-symbol-mode)
+  :bind ("<f3>" . highlight-symbol))
 
 (use-package company-tabnine
   :init (add-to-list 'company-backends #'company-tabnine)
@@ -183,11 +208,12 @@
   :config
   (setq dashboard-banner-logo-title "Coding is happening")
   (setq dashboard-projects-backend 'projectile)
-  ;; (setq dashboard-startup-banner "/path/to/image")
+  ;; (setq dashboard-startup-banner "~/Pictures/SharkVYS/SharkVYS_tran_black.png")
+  (setq dashboard-startup-banner 'official)
   (setq dashboard-items '((recents  . 5)
 						  (bookmarks . 5)
 						  (projects . 10)))
-      (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook))
 
 ;; sml-mode -- smart mode line
 (use-package smart-mode-line
@@ -195,6 +221,11 @@
   :config
   (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
   (sml/setup))
+
+(use-package smooth-scroll
+  :ensure t
+  :config
+  (smooth-scroll-mode 1))
 
 ;; SSH remote
 ;; (defun connect-homeserver ()
@@ -204,15 +235,9 @@
 ;;   (interactive)
 ;;   (dired "/ssh:pavin@172.16.172.133:/home/pavin/Code/"))
 ;; (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
-
-;; set theme
-(add-to-list 'load-path (expand-file-name "themes" user-emacs-directory))
-(add-to-list 'custom-theme-load-path (expand-file-name "themes" user-emacs-directory))
-(load-theme 'monokai-pro t)
-
-;; Variables configured via the interactive 'customize' interface
-(when (file-exists-p custom-file)
-  (load custom-file))
+(setq url-proxy-services '(("http" . "127.0.0.1:18080")
+			   ("https" . "127.0.0.1:18080")
+			   ("all" . "127.0.0.1:18080")))
 
 (provide 'init)
 

@@ -16,6 +16,12 @@
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
 (menu-bar-mode -1)
+(tool-bar-mode -1)
+(when (display-graphic-p) (toggle-scroll-bar -1))
+(add-to-list 'default-frame-alist '(width . 90))
+(add-to-list 'default-frame-alist '(height . 55))
+
+(put 'scroll-left 'disabled nil)
 ;; (add-hook 'rust-mode-hook
 ;; 		  (lambda () (setq indent-tabs-mode nil)))
 
@@ -29,6 +35,9 @@
 ;; Set end to super
 (global-set-key (kbd "<end>") nil)
 (define-key function-key-map (kbd "<end>") 'event-apply-super-modifier)
+
+(global-set-key [wheel-right] 'scroll-left)
+(global-set-key [wheel-left] 'scroll-right)
 
 ;; Shortcuts
 (global-set-key (kbd "C-j") nil)
@@ -56,52 +65,26 @@
 (global-set-key (kbd"M-n") 'next-ten-lines)
 (global-set-key (kbd"M-p") 'previous-ten-lines)
 
-;; Move text in a line
-(defun move-line (n)
-  "Move the current line up or down by N lines."
-  (interactive "p")
-  (setq col (current-column))
-  (beginning-of-line) (setq start (point))
-  (end-of-line) (forward-char) (setq end (point))
-  (let ((line-text (delete-and-extract-region start end)))
-    (forward-line n)
-    (insert line-text)
-    ;; restore point to original column in moved line
-    (forward-line -1)
-    (forward-char col)))
-
-(defun move-line-up (n)
-  "Move the current line up by N lines."
-  (interactive "p")
-  (move-line (if (null n) -1 (- n))))
-
-(defun move-line-down (n)
-  "Move the current line down by N lines."
-  (interactive "p")
-  (move-line (if (null n) 1 n)))
-
-(global-set-key (kbd "M-P") 'move-line-up)
-(global-set-key (kbd "M-N") 'move-line-down)
-
 ;; pretty paste and copy
-(defun pbpaste ()
-  "Paste data from pasteboard."
-  (interactive)
-  (shell-command-on-region
-   (point)
-   (if mark-active (mark) (point))
-   "pbpaste" nil t))
-
-(defun pbcopy ()
-  "Copy region to pasteboard."
-  (interactive)
-  (print (mark))
-  (when mark-active
+(unless (display-graphic-p)
+  (defun pbpaste ()
+	"Paste data from pasteboard."
+	(interactive)
 	(shell-command-on-region
-	 (point) (mark) "pbcopy")
-	(kill-buffer "*Shell Command Output*")))
-(global-set-key (kbd "C-x C-y") 'pbpaste)
-(global-set-key (kbd "C-x C-w") 'pbcopy)
+	 (point)
+	 (if mark-active (mark) (point))
+	 "pbpaste" nil t))
+
+  (defun pbcopy ()
+	"Copy region to pasteboard."
+	(interactive)
+	(print (mark))
+	(when mark-active
+	  (shell-command-on-region
+	   (point) (mark) "pbcopy")
+	  (kill-buffer "*Shell Command Output*"))))
+;; (global-set-key (kbd "C-x C-y") 'pbpaste)
+;; (global-set-key (kbd "C-x C-w") 'pbcopy)
 
 ;; switch windows-spliting between horizontally and vertically
 (defun toggle-window-split ()

@@ -12,12 +12,15 @@
 
 
 ;;; Standard package repositories
-
-(add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
+;; (setq url-proxy-services '(("no_proxy" . "^\\(10\\..*\\|192\\.168\\..*\\)")
+;;                            ("http" . "localhost:10108")
+;; 						   ("https" . "localhost:10108")))
+;; (add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '( "melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
 ;; (add-to-list 'package-archives
 ;;              '("MELPA Stable" . "https://stable.melpa.org/packages/") t)
-(add-to-list 'package-archives
-             '("MELPA Stable" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa-stable/") t)
+;; (add-to-list 'package-archives
+;;              '("MELPA Stable" . "https://mirrors.tuna.tsinghua.edu.cn/elpa/melpa-stable/") t)
 ;; (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/") t)
 ;;(add-to-list 'load-path "~/.emacs.d/elpa/org-9.3.6/lisp")
 
