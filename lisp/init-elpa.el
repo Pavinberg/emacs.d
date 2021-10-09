@@ -12,11 +12,15 @@
 
 
 ;;; Standard package repositories
-;; (setq url-proxy-services '(("no_proxy" . "^\\(10\\..*\\|192\\.168\\..*\\)")
-;;                            ("http" . "localhost:10108")
-;; 						   ("https" . "localhost:10108")))
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(setq url-proxy-services '(("no_proxy" . "^\\(192\\.168\\..*\\)")
+                           ("http" . "localhost:10108")
+						   ("https" . "localhost:10108")))
+(setq package-archives '(("gnu"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
+                         ("melpa" . "http://mirrors.cloud.tencent.com/elpa/melpa/")))
+;; (add-to-list 'package-archives '("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") t)
 ;; (add-to-list 'package-archives '( "melpa" . "https://melpa.org/packages/") t)
-(add-to-list 'package-archives '( "melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
+;; (add-to-list 'package-archives '( "melpa_tsinghua" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/") t)
 ;; (add-to-list 'package-archives
 ;;              '("MELPA Stable" . "https://stable.melpa.org/packages/") t)
 ;; (add-to-list 'package-archives
@@ -25,7 +29,7 @@
 ;;(add-to-list 'load-path "~/.emacs.d/elpa/org-9.3.6/lisp")
 
 ;; Official MELPA Mirror, in case necessary.
-;;(add-to-list 'package-archives (cons "melpa-mirror" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/")) t)
+;; (add-to-list 'package-archives (cons "melpa-mirror" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/")) t)
 
 
 ;; Work-around for https://debbugs.gnu.org/cgi/bugreport.cgi?bug=34341

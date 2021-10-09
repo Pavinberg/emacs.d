@@ -41,7 +41,7 @@
   (require 'use-package))
 
 (require 'init-latex)
-
+(require 'init-chinese-word-segment)
 ;; ===========================================
 ;; Basic Customization (in init-preload-local)
 ;; ===========================================
@@ -61,13 +61,28 @@
   ("C-x b" . 'ivy-switch-buffer)
   ("C-c v" . 'ivy-push-view)
   ("C-c V" . 'ivy-pop-view)
+  ("C-x C-@" . 'counsel-mark-ring)
+  ("C-x C-SPC" . 'counsel-mark-ring)
   ("<f1> f" . 'counsel-describe-function)
   ("<f1> v" . 'counsel-describe-variable)
   ("<f1> i" . 'counsel-info-lookup-symbol))
 
-;; avy
 (use-package avy
   :bind (("C-j C-SPC" . avy-goto-word-1))
+  :ensure t)
+
+(use-package ace-window
+  :bind (("C-x o" . 'ace-window))
+  :ensure t)
+
+(use-package multiple-cursors
+  :bind
+  ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
+
+(use-package mwim
+  :bind
+  ("C-a" . mwim-beginning-of-code-or-line)
+  ("C-e" . mwim-end-of-code-or-line)
   :ensure t)
 
 (use-package company
@@ -99,7 +114,11 @@
 
 (use-package projectile
   :bind (("C-c p" . projectile-command-map))
+  :config (setq projectile-mode-line "Projectile")
   :ensure t)
+(defadvice projectile-project-root (around ignore-remote first activate)
+  (unless (file-remote-p default-directory) ad-do-it))
+
 
 (use-package counsel-projectile
   :ensure t
@@ -111,20 +130,31 @@
 
 (use-package all-the-icons)
 
+(use-package yaml-mode)
+
+(defun enable-lsp-if-not-remote ()
+  (unless (file-remote-p default-directory) (lsp)))
+
 ;; lisp-mode
 (use-package lsp-mode
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l"
 		lsp-file-watch-threshold 500)
-		;; lsp-prefer-flymake nil)
-  :hook ((c-mode . lsp)
-		 (c++-mode . lsp)
-		 (python-mode . lsp)
+  ;; lsp-prefer-flymake nil)
+  :hook ((c-mode . enable-lsp-if-not-remote)
+		 (c++-mode . (lambda () (unless (file-remote-p default-directory) (lsp))))
+		 (python-mode . enable-lsp-if-not-remote)
 		 (rust-mode . lsp)
 		 ;; if you want which-key integration
 		 (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
+  ;; :config
+  ;; (lsp-register-client
+  ;;  (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
+  ;; 					:major-modes '(python-mode)
+  ;; 					:remote? t
+  ;; 					:server-id 'pyls-remote))
   :custom (lsp-headerline-breadcrumb-enable t)
   :ensure t)
 
@@ -132,7 +162,8 @@
   :ensure t
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references))
+  (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+  (setq lsp-ui-doc-position 'at-point))
 
 (use-package lsp-ivy
   :ensure t
@@ -202,18 +233,18 @@
   :init
   (global-undo-tree-mode))
 
-(use-package dashboard
-  :ensure t
-  :diminish dashboard-mode
-  :config
-  (setq dashboard-banner-logo-title "Coding is happening")
-  (setq dashboard-projects-backend 'projectile)
-  ;; (setq dashboard-startup-banner "~/Pictures/SharkVYS/SharkVYS_tran_black.png")
-  (setq dashboard-startup-banner 'official)
-  (setq dashboard-items '((recents  . 5)
-						  (bookmarks . 5)
-						  (projects . 10)))
-  (dashboard-setup-startup-hook))
+;; (use-package dashboard
+;;   :ensure t
+;;   :diminish dashboard-mode
+;;   :config
+;;   (setq dashboard-banner-logo-title "Coding is happening")
+;;   (setq dashboard-projects-backend 'projectile)
+;;   (setq dashboard-startup-banner 'official)
+;;   (setq dashboard-items '((recents  . 5)
+;; 						  (bookmarks . 5)
+;; 						  (projects . 10)))
+;;   (dashboard-setup-startup-hook) ;; TODO some bug here
+;;   )
 
 ;; sml-mode -- smart mode line
 (use-package smart-mode-line
@@ -235,9 +266,6 @@
 ;;   (interactive)
 ;;   (dired "/ssh:pavin@172.16.172.133:/home/pavin/Code/"))
 ;; (eval-after-load 'tramp '(setenv "SHELL" "/bin/bash"))
-(setq url-proxy-services '(("http" . "127.0.0.1:18080")
-			   ("https" . "127.0.0.1:18080")
-			   ("all" . "127.0.0.1:18080")))
 
 (provide 'init)
 

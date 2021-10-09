@@ -22,8 +22,15 @@
 (add-to-list 'default-frame-alist '(height . 55))
 
 (put 'scroll-left 'disabled nil)
-;; (add-hook 'rust-mode-hook
-;; 		  (lambda () (setq indent-tabs-mode nil)))
+
+(savehist-mode 1)
+(setq savehist-file "~/.emacs.d/.savehist")
+(setq history-length t)
+(setq history-delete-duplicates t)
+(setq savehist-additional-variables
+      '(kill-ring
+        search-ring
+        regexp-search-ring))
 
 ;;; keyboard setting
 (global-set-key (kbd "RET") 'newline-and-indent)
@@ -47,10 +54,15 @@
 (global-set-key (kbd "C-j C-k") 'kill-whole-line)
 (global-set-key (kbd "C-a") 'back-to-indentation) ;; swap C-a and M-m
 (global-set-key (kbd "M-m") 'move-beginning-of-line)
-(global-set-key (kbd "H-o") 'other-window)
 ;;(global-set-key (kbd "H-k") 'kill-buffer)
 (global-set-key (kbd "H-h") 'hs-hide-block)
 (global-set-key (kbd "H-s") 'hs-show-block)
+(cond ((string-equal system-type "darwin")
+       (progn
+         ;; modify option and command key
+         (setq mac-command-modifier 'control)
+         ;; (setq mac-option-modifier 'meta)
+		 )))
 
 ;; Faster move cursor
 (defun next-ten-lines()
