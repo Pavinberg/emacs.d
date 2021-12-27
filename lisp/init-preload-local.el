@@ -4,18 +4,19 @@
 
 (setq-default tab-width 4)
 (electric-pair-mode t)
+(add-hook 'prog-mode-hook #'show-paren-mode)
 (column-number-mode t)
 (global-auto-revert-mode t)
+(delete-selection-mode t)
 (setq inhibit-startup-message t)    ;; Hide the startup message
 (setq-default python-indent 4)
 (setq c-basic-offset 4)
 ;;(setq-default indent-tabs-mode nil)
 (setq make-backup-files nil) ; stop creating backup~ files
 (add-hook 'prog-mode-hook #'hs-minor-mode)
-(add-hook 'prog-mode-hook #'show-paren-mode)
 (global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
-(menu-bar-mode -1)
+;; (menu-bar-mode -1)
 (tool-bar-mode -1)
 (when (display-graphic-p) (toggle-scroll-bar -1))
 (add-to-list 'default-frame-alist '(width . 90))
@@ -31,6 +32,7 @@
       '(kill-ring
         search-ring
         regexp-search-ring))
+(setq enable-remote-dir-locals t)
 
 ;;; keyboard setting
 (global-set-key (kbd "RET") 'newline-and-indent)
@@ -52,6 +54,7 @@
 (global-set-key (kbd "C-w") 'kill-ring-save)
 (global-set-key (kbd "C-c '") 'comment-or-uncomment-region)
 (global-set-key (kbd "C-j C-k") 'kill-whole-line)
+(global-set-key (kbd "C-j C-l") 'copy-whole-line)
 (global-set-key (kbd "C-a") 'back-to-indentation) ;; swap C-a and M-m
 (global-set-key (kbd "M-m") 'move-beginning-of-line)
 ;;(global-set-key (kbd "H-k") 'kill-buffer)
@@ -65,65 +68,11 @@
 		 )))
 
 ;; Faster move cursor
-(defun next-ten-lines()
-  "Move cursor to next 10 lines."
-  (interactive)
-  (next-line 10))
+(global-set-key (kbd "M-n") 'next-ten-lines)
+(global-set-key (kbd "M-p") 'previous-ten-lines)
 
-(defun previous-ten-lines()
-  "Move cursor to previous 10 lines."
-  (interactive)
-  (previous-line 10))
-(global-set-key (kbd"M-n") 'next-ten-lines)
-(global-set-key (kbd"M-p") 'previous-ten-lines)
-
-;; pretty paste and copy
-(unless (display-graphic-p)
-  (defun pbpaste ()
-	"Paste data from pasteboard."
-	(interactive)
-	(shell-command-on-region
-	 (point)
-	 (if mark-active (mark) (point))
-	 "pbpaste" nil t))
-
-  (defun pbcopy ()
-	"Copy region to pasteboard."
-	(interactive)
-	(print (mark))
-	(when mark-active
-	  (shell-command-on-region
-	   (point) (mark) "pbcopy")
-	  (kill-buffer "*Shell Command Output*"))))
 ;; (global-set-key (kbd "C-x C-y") 'pbpaste)
 ;; (global-set-key (kbd "C-x C-w") 'pbcopy)
-
-;; switch windows-spliting between horizontally and vertically
-(defun toggle-window-split ()
-  (interactive)
-  (if (= (count-windows) 2)
-	  (let* ((this-win-buffer (window-buffer))
-			 (next-win-buffer (window-buffer (next-window)))
-			 (this-win-edges (window-edges (selected-window)))
-			 (next-win-edges (window-edges (next-window)))
-			 (this-win-2nd (not (and (<= (car this-win-edges)
-										 (car next-win-edges))
-									 (<= (cadr this-win-edges)
-										 (cadr next-win-edges)))))
-			 (splitter
-			  (if (= (car this-win-edges)
-					 (car (window-edges (next-window))))
-				  'split-window-horizontally
-				'split-window-vertically)))
-		(delete-other-windows)
-		(let ((first-win (selected-window)))
-		  (funcall splitter)
-		  (if this-win-2nd (other-window 1))
-		  (set-window-buffer (selected-window) this-win-buffer)
-		  (set-window-buffer (next-window) next-win-buffer)
-		  (select-window first-win)
-
-		  (if this-win-2nd (other-window 1))))))
 
 ;; bookmark
 (global-set-key (kbd "H-x m") 'bookmark-set)

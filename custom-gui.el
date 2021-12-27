@@ -9,19 +9,28 @@
  '(ivy-mode t)
  '(ivy-use-virtual-buffers t)
  '(package-selected-packages
-   '(exec-path-from-shell gnu-elpa-keyring-update fullframe seq projectile-ripgrep dashboard rainbow-mode smooth-scroll pdf-tools auctex))
+   '(exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode smooth-scroll pdf-tools auctex))
  '(ring-bell-function 'ignore)
+ '(safe-local-variable-values
+   '((c-file-style . gnu)
+	 (flycheck-clang-include-path list
+								  (concat "-I"
+										  (projectile-project-root)
+										  "build"))))
  '(visible-bell nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(company-tooltip-selection ((t (:extend t :background "gray45" :weight normal))))
  '(dashboard-heading ((t (:foreground "light slate blue"))))
  '(dashboard-items-face ((t (:foreground "light gray"))))
  '(dashboard-no-items-face ((t (:foreground "light gray"))))
  '(dashboard-text-banner ((t (:foreground "magenta"))))
  '(ivy-current-match ((t (:extend t :background "#7a7d8b"))))
  '(lsp-face-highlight-read ((t (:background "#6a6d7b"))))
+ '(lsp-face-highlight-textual ((t (:background "gray21"))))
+ '(region ((t (:extend t :background "gray24"))))
  '(show-paren-match ((t (:background "gray89" :foreground "light slate blue" :weight normal))))
  '(tooltip ((t (:background "gray30" :foreground "#eaf2f1")))))

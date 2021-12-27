@@ -29,7 +29,6 @@
 (require 'init-site-lisp) ;; Must come before elpa, as it may provide package.el
 ;; Calls (package-initialize)
 (require 'init-elpa)      ;; Machinery for installing required packages
-(require 'init-exec-path) ;; Set up $PATH
 
 ;; Allow users to provide an optional "init-preload-local.el"
 (require 'init-preload-local nil t)
@@ -37,7 +36,7 @@
 
 (eval-when-compile
   ;; Following line is not needed if use-package.el is in ~/.emacs.d
-  (add-to-list 'load-path "elpa/use-package-2.4.1/")
+  ;; (add-to-list 'load-path "elpa/use-package-2.4.1/")
   (require 'use-package))
 
 (require 'init-latex)
@@ -50,40 +49,51 @@
   :ensure t
   :init
   (ivy-mode 1)
+  (counsel-mode 1)
   :config
   (setq ivy-use-virtual-buffers t)
+  (setq search-default-mode #'char-fold-to-regexp)
   (setq ivy-count-format "(%d/%d) ")
   :bind
-  ("C-s" . 'swiper-isearch)
-  ("M-x" . 'counsel-M-x)
-  ("C-x C-f" . 'counsel-find-file)
-  ("M-y" . counsel-yank-pop)
-  ("C-x b" . 'ivy-switch-buffer)
-  ("C-c v" . 'ivy-push-view)
-  ("C-c V" . 'ivy-pop-view)
-  ("C-x C-@" . 'counsel-mark-ring)
-  ("C-x C-SPC" . 'counsel-mark-ring)
-  ("<f1> f" . 'counsel-describe-function)
-  ("<f1> v" . 'counsel-describe-variable)
-  ("<f1> i" . 'counsel-info-lookup-symbol))
+  (("C-s" . 'swiper)
+   ("C-x b" . 'ivy-switch-buffer)
+   ("C-c v" . 'ivy-push-view)
+   ("C-c s" . 'ivy-switch-view)
+   ("C-c V" . 'ivy-pop-view)
+   ("C-x C-@" . 'counsel-mark-ring); 在某些终端上 C-x C-SPC 会被映射为 C-x C-@，比如在 macOS 上，所以要手动设置
+   ("C-x C-SPC" . 'counsel-mark-ring)
+   :map minibuffer-local-map
+   ("C-r" . counsel-minibuffer-history)))
+
+(use-package amx
+  :ensure t
+  :init
+  (amx-mode 1))
 
 (use-package avy
-  :bind (("C-j C-SPC" . avy-goto-word-1))
+  :bind (("C-j C-SPC" . avy-goto-char-timer))
   :ensure t)
 
+(use-package exec-path-from-shell
+  :ensure t
+  :config
+  (setq exec-path-from-shell-arguments nil)
+  (when (memq window-system '(mac ns x))
+	(exec-path-from-shell-initialize)))
+
 (use-package ace-window
-  :bind (("C-x o" . 'ace-window))
-  :ensure t)
+  :ensure t
+  :bind (("C-x o" . 'ace-window)))
 
 (use-package multiple-cursors
   :bind
   ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
 
 (use-package mwim
+  :ensure t
   :bind
   ("C-a" . mwim-beginning-of-code-or-line)
-  ("C-e" . mwim-end-of-code-or-line)
-  :ensure t)
+  ("C-e" . mwim-end-of-code-or-line))
 
 (use-package company
   :ensure t
@@ -104,13 +114,26 @@
   ;; :init (global-flycheck-mode)
   :hook
   (prog-mode . flycheck-mode)
-  (c++-mode-hook . (lambda () (setq flycheck-clang-language-standard "c++11")))
+  (c++-mode-hook . (lambda () (setq flycheck-clang-language-standard "c++17")))
   :ensure t)
 
 (use-package yasnippet
   :ensure t
   :init
   (yas-global-mode))
+
+(use-package dashboard
+  :ensure t
+  :diminish dashboard-mode
+  :config
+  (setq dashboard-banner-logo-title "Coding is happening")
+  (setq dashboard-projects-backend 'projectile)
+  (setq dashboard-startup-banner 'official)
+  (setq dashboard-items '((recents  . 5)
+						  (bookmarks . 5)
+						  (projects . 10)))
+  (dashboard-setup-startup-hook) ;; TODO some bug here
+  )
 
 (use-package projectile
   :bind (("C-c p" . projectile-command-map))
@@ -168,6 +191,13 @@
 (use-package lsp-ivy
   :ensure t
   :after (lsp-mode))
+
+(use-package dap-mode
+  :ensure t
+  :commands dap-debug
+  :config
+  (require 'dap-gdb-lldb)
+  (dap-ui-mode 1))
 
 (use-package treemacs
   :ensure t
@@ -233,25 +263,17 @@
   :init
   (global-undo-tree-mode))
 
-;; (use-package dashboard
-;;   :ensure t
-;;   :diminish dashboard-mode
-;;   :config
-;;   (setq dashboard-banner-logo-title "Coding is happening")
-;;   (setq dashboard-projects-backend 'projectile)
-;;   (setq dashboard-startup-banner 'official)
-;;   (setq dashboard-items '((recents  . 5)
-;; 						  (bookmarks . 5)
-;; 						  (projects . 10)))
-;;   (dashboard-setup-startup-hook) ;; TODO some bug here
-;;   )
-
 ;; sml-mode -- smart mode line
 (use-package smart-mode-line
   :ensure t
   :config
-  (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
+  ; (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
   (sml/setup))
+
+(use-package google-this
+  :ensure t
+  :config
+  (google-this-mode 1))
 
 (use-package smooth-scroll
   :ensure t

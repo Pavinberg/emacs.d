@@ -20,3 +20,7 @@ site-lisp/package/
 /.lsp-session-v1
 /eshell
 .DS_Store/
+.savehist
+amx-items
+.extension/
+.dap-breakpoints

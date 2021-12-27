@@ -70,6 +70,71 @@
         (error "Cannot open tramp file")
       (browse-url (concat "file://" file-name)))))
 
+(defun copy-whole-line ()
+  (interactive)
+  (save-excursion
+    (back-to-indentation)
+    (kill-ring-save
+     (point)
+     (line-end-position)))
+  (message "1 line copied"))
+
+;; Faster move cursor
+(defun next-ten-lines()
+  "Move cursor to next 10 lines."
+  (interactive)
+  (next-line 10))
+
+(defun previous-ten-lines()
+  "Move cursor to previous 10 lines."
+  (interactive)
+  (previous-line 10))
+
+;; pretty paste and copy
+(unless (display-graphic-p)
+  (defun pbpaste ()
+	"Paste data from pasteboard."
+	(interactive)
+	(shell-command-on-region
+	 (point)
+	 (if mark-active (mark) (point))
+	 "pbpaste" nil t))
+
+  (defun pbcopy ()
+	"Copy region to pasteboard."
+	(interactive)
+	(print (mark))
+	(when mark-active
+	  (shell-command-on-region
+	   (point) (mark) "pbcopy")
+	  (kill-buffer "*Shell Command Output*"))))
+
+(defun toggle-window-split ()
+  "Switch windows-spliting between horizontally and vertically."
+  (interactive)
+  (if (= (count-windows) 2)
+	  (let* ((this-win-buffer (window-buffer))
+			 (next-win-buffer (window-buffer (next-window)))
+			 (this-win-edges (window-edges (selected-window)))
+			 (next-win-edges (window-edges (next-window)))
+			 (this-win-2nd (not (and (<= (car this-win-edges)
+										 (car next-win-edges))
+									 (<= (cadr this-win-edges)
+										 (cadr next-win-edges)))))
+			 (splitter
+			  (if (= (car this-win-edges)
+					 (car (window-edges (next-window))))
+				  'split-window-horizontally
+				'split-window-vertically)))
+		(delete-other-windows)
+		(let ((first-win (selected-window)))
+		  (funcall splitter)
+		  (if this-win-2nd (other-window 1))
+		  (set-window-buffer (selected-window) this-win-buffer)
+		  (set-window-buffer (next-window) next-win-buffer)
+		  (select-window first-win)
+
+		  (if this-win-2nd (other-window 1))))))
 
 (provide 'init-utils)
 ;;; init-utils.el ends here
