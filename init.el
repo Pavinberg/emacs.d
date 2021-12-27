@@ -39,8 +39,8 @@
   ;; (add-to-list 'load-path "elpa/use-package-2.4.1/")
   (require 'use-package))
 
-(require 'init-latex)
-(require 'init-chinese-word-segment)
+;; (require 'init-latex)
+;; (require 'init-chinese-word-segment)
 ;; ===========================================
 ;; Basic Customization (in init-preload-local)
 ;; ===========================================
@@ -106,10 +106,6 @@
   (setq company-selection-wrap-around t)
   (setq company-transformers '(company-sort-by-occurrence)))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode)
-  :ensure t)
-
 (use-package flycheck
   ;; :init (global-flycheck-mode)
   :hook
@@ -151,9 +147,9 @@
 ;; slime
 (setq inferior-lisp-program "sbcl")
 
-(use-package all-the-icons)
+;; (use-package all-the-icons)
 
-(use-package yaml-mode)
+;; (use-package yaml-mode)
 
 (defun enable-lsp-if-not-remote ()
   (unless (file-remote-p default-directory) (lsp)))
@@ -269,11 +265,6 @@
   :config
   ; (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
   (sml/setup))
-
-(use-package google-this
-  :ensure t
-  :config
-  (google-this-mode 1))
 
 (use-package smooth-scroll
   :ensure t
