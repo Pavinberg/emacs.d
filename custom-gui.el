@@ -9,7 +9,7 @@
  '(ivy-mode t)
  '(ivy-use-virtual-buffers t)
  '(package-selected-packages
-   '(exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode smooth-scroll pdf-tools auctex))
+   '(embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode smooth-scroll pdf-tools auctex))
  '(ring-bell-function 'ignore)
  '(safe-local-variable-values
    '((c-file-style . gnu)

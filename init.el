@@ -67,17 +67,48 @@
 
 (use-package amx
   :ensure t
+  :init (amx-mode))
+
+(use-package embark
+  :ensure t
   :init
-  (amx-mode 1))
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :config
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none))))
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings))) ;; alternative for `describe-bindings'
 
 (use-package avy
-  :bind (("C-j C-SPC" . avy-goto-char-timer))
-  :ensure t)
+  :ensure t
+  :config
+  (defun avy-action-embark (pt)
+	(unwind-protect
+		(save-excursion
+          (goto-char pt)
+          (embark-act))
+      (select-window
+       (cdr (ring-ref avy-ring 0))))
+	t)
+  (setf (alist-get ?e avy-dispatch-alist) 'avy-action-embark)
+  :bind
+  (("C-j C-SPC" . avy-goto-char-timer)))
+
+(use-package marginalia
+  :ensure t
+  :init (marginalia-mode)
+  :bind (:map minibuffer-local-map
+			  ("M-A" . marginalia-cycle)))
 
 (use-package exec-path-from-shell
   :ensure t
-  :config
-  (setq exec-path-from-shell-arguments nil)
+  :init
   (when (memq window-system '(mac ns x))
 	(exec-path-from-shell-initialize)))
 
@@ -97,8 +128,8 @@
 
 (use-package company
   :ensure t
+  :init (global-company-mode)
   :config
-  (global-company-mode t)
   (setq company-minimum-prefix-length 1)
   (setq company-tooltip-align-annotations t)
   (setq company-idle-delay 0.0)
@@ -107,20 +138,19 @@
   (setq company-transformers '(company-sort-by-occurrence)))
 
 (use-package company-box
-  :hook (company-mode . company-box-mode)
-  :ensure t)
+  :ensure t
+  :hook (company-mode . company-box-mode))
 
 (use-package flycheck
+  :ensure t
   ;; :init (global-flycheck-mode)
   :hook
   (prog-mode . flycheck-mode)
-  (c++-mode-hook . (lambda () (setq flycheck-clang-language-standard "c++17")))
-  :ensure t)
+  (c++-mode-hook . (lambda () (setq flycheck-clang-language-standard "c++17"))))
 
 (use-package yasnippet
   :ensure t
-  :init
-  (yas-global-mode))
+  :init (yas-global-mode))
 
 (use-package dashboard
   :ensure t
@@ -136,17 +166,17 @@
   )
 
 (use-package projectile
+  :ensure t
   :bind (("C-c p" . projectile-command-map))
-  :config (setq projectile-mode-line "Projectile")
-  :ensure t)
-(defadvice projectile-project-root (around ignore-remote first activate)
-  (unless (file-remote-p default-directory) ad-do-it))
-
+  :config
+  (setq projectile-mode-line "Projectile")
+  (defadvice projectile-project-root (around ignore-remote first activate)
+	(unless (file-remote-p default-directory) ad-do-it)))
 
 (use-package counsel-projectile
   :ensure t
   :after (projectile)
-  :config (counsel-projectile-mode))
+  :init (counsel-projectile-mode))
 
 ;; slime
 (setq inferior-lisp-program "sbcl")
@@ -160,6 +190,7 @@
 
 ;; lisp-mode
 (use-package lsp-mode
+  :ensure t
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l"
@@ -178,8 +209,7 @@
   ;; 					:major-modes '(python-mode)
   ;; 					:remote? t
   ;; 					:server-id 'pyls-remote))
-  :custom (lsp-headerline-breadcrumb-enable t)
-  :ensure t)
+  :custom (lsp-headerline-breadcrumb-enable t))
 
 (use-package lsp-ui
   :ensure t
@@ -212,12 +242,12 @@
         ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
+  :ensure t
+  :after (treemacs projectile))
 
 (use-package lsp-treemacs
-  :after (treemacs lsp)
-  :ensure t)
+  :ensure t
+  :after (treemacs lsp))
 
 (use-package rust-mode
   :ensure t
@@ -229,8 +259,8 @@
   :hook (rust-mode . cargo-minor-mode))
 
 (use-package which-key
-  :config (which-key-mode)
-  :ensure t)
+  :ensure t
+  :init (which-key-mode))
 
 (use-package highlight-symbol
   :ensure t
@@ -238,8 +268,8 @@
   :bind ("<f3>" . highlight-symbol))
 
 (use-package company-tabnine
-  :init (add-to-list 'company-backends #'company-tabnine)
-  :ensure t)
+  :ensure t
+  :init (add-to-list 'company-backends #'company-tabnine))
 
 ;; My mode about CALPUFF
 ;; (load-file "~/.emacs.d/mymode/inp-mode.el")
@@ -247,38 +277,37 @@
 
 ;; multiple-cursors
 (use-package multiple-cursors
-  :bind (("M-s M-e" . mc/edit-lines))
-  :ensure t)
+  :ensure t
+  :bind (("M-s M-e" . mc/edit-lines)))
 
 ;; Python
 (require 'init-python)
 
 ;; rainbow delimiters
 (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode)
-  :ensure t)
+  :ensure t
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package undo-tree
   :ensure t
-  :init
-  (global-undo-tree-mode))
+  :init (global-undo-tree-mode))
 
 ;; sml-mode -- smart mode line
 (use-package smart-mode-line
   :ensure t
-  :config
+  :init
   ; (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
   (sml/setup))
 
 (use-package google-this
   :ensure t
-  :config
+  :init
   (google-this-mode 1))
 
 (use-package smooth-scroll
   :ensure t
   :config
-  (smooth-scroll-mode 1))
+  (smooth-scroll-mode))
 
 ;; SSH remote
 ;; (defun connect-homeserver ()
