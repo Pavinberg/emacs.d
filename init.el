@@ -18,17 +18,17 @@
 ;;----------------------------------------------------------------------------
 ;; Adjust garbage collection thresholds during startup, and thereafter
 ;;----------------------------------------------------------------------------
-(setq normal-gc-cons-threshold (* 20 1024 1024))
-(let ((init-gc-cons-threshold (* 128 1024 1024)))
-  (setq gc-cons-threshold init-gc-cons-threshold)
-  (add-hook 'emacs-startup-hook
-			(lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+
+(setq gc-cons-threshold (* 128 1024 1024))
+(add-hook 'emacs-startup-hook
+		  (lambda () (setq gc-cons-threshold (* 20 1024 1024))))
 
 ;; Bootstrap config
 (require 'init-utils)
 (require 'init-site-lisp) ;; Must come before elpa, as it may provide package.el
 ;; Calls (package-initialize)
 (require 'init-elpa)      ;; Machinery for installing required packages
+;; (setq package-native-compile t)
 
 ;; Allow users to provide an optional "init-preload-local.el"
 (require 'init-preload-local nil t)
@@ -40,10 +40,17 @@
   (require 'use-package))
 
 (require 'init-latex)
-(require 'init-chinese-word-segment)
+(require 'init-iterm)
+;; (require 'init-chinese-word-segment)
 ;; ===========================================
 ;; Basic Customization (in init-preload-local)
 ;; ===========================================
+
+(use-package hydra
+  :ensure t)
+
+(use-package use-package-hydra
+  :ensure t)
 
 (use-package ivy
   :ensure t
@@ -106,19 +113,19 @@
   :bind (:map minibuffer-local-map
 			  ("M-A" . marginalia-cycle)))
 
+;; (use-package hydra
+;;   :ensure t)
+
 (use-package exec-path-from-shell
   :ensure t
   :init
   (when (memq window-system '(mac ns x))
+	(setq exec-path-from-shell-arguments nil)
 	(exec-path-from-shell-initialize)))
 
 (use-package ace-window
   :ensure t
   :bind (("C-x o" . 'ace-window)))
-
-(use-package multiple-cursors
-  :bind
-  ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
 
 (use-package mwim
   :ensure t
@@ -140,6 +147,10 @@
 (use-package company-box
   :ensure t
   :hook (company-mode . company-box-mode))
+
+;; (use-package company-tabnine
+;;   :ensure t
+;;   :init (add-to-list 'company-backends #'company-tabnine))
 
 (use-package flycheck
   :ensure t
@@ -181,12 +192,17 @@
 ;; slime
 (setq inferior-lisp-program "sbcl")
 
-(use-package all-the-icons)
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
 
-(use-package yaml-mode)
+(use-package yaml-mode
+  :ensure t
+  :defer t)
 
 (defun enable-lsp-if-not-remote ()
   (unless (file-remote-p default-directory) (lsp)))
+
 
 ;; lisp-mode
 (use-package lsp-mode
@@ -197,9 +213,9 @@
 		lsp-file-watch-threshold 500)
   ;; lsp-prefer-flymake nil)
   :hook ((c-mode . enable-lsp-if-not-remote)
-		 (c++-mode . (lambda () (unless (file-remote-p default-directory) (lsp))))
+		 (c++-mode . enable-lsp-if-not-remote)
 		 (python-mode . enable-lsp-if-not-remote)
-		 (rust-mode . lsp)
+		 (rust-mode . enable-lsp-if-not-remote)
 		 ;; if you want which-key integration
 		 (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp
@@ -267,10 +283,6 @@
   :init (highlight-symbol-mode)
   :bind ("<f3>" . highlight-symbol))
 
-(use-package company-tabnine
-  :ensure t
-  :init (add-to-list 'company-backends #'company-tabnine))
-
 ;; My mode about CALPUFF
 ;; (load-file "~/.emacs.d/mymode/inp-mode.el")
 ;; (add-to-list 'auto-mode-alist '("\\.inp\\'" . inp-mode))
@@ -278,7 +290,36 @@
 ;; multiple-cursors
 (use-package multiple-cursors
   :ensure t
-  :bind (("M-s M-e" . mc/edit-lines)))
+  :after hydra
+  :bind
+  (("C-x C-h m" . hydra-multiple-cursors/body)
+   ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
+  :hydra (hydra-multiple-cursors
+		  (:hint nil)
+		  "
+Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
+------------------------------------------------------------------
+ [_p_]   Prev     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
+ [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
+ [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search      [_q_] Quit
+ [_|_] Align with input CHAR       [Click] Cursor at point"
+		  ("l" mc/edit-lines :exit t)
+		  ("a" mc/mark-all-like-this :exit t)
+		  ("n" mc/mark-next-like-this)
+		  ("N" mc/skip-to-next-like-this)
+		  ("M-n" mc/unmark-next-like-this)
+		  ("p" mc/mark-previous-like-this)
+		  ("P" mc/skip-to-previous-like-this)
+		  ("M-p" mc/unmark-previous-like-this)
+		  ("|" mc/vertical-align)
+		  ("s" mc/mark-all-in-region-regexp :exit t)
+		  ("0" mc/insert-numbers :exit t)
+		  ("A" mc/insert-letters :exit t)
+		  ("<mouse-1>" mc/add-cursor-on-click)
+		  ;; Help with click recognition in this hydra
+		  ("<down-mouse-1>" ignore)
+		  ("<drag-mouse-1>" ignore)
+		  ("q" nil)))
 
 ;; Python
 (require 'init-python)
@@ -288,9 +329,28 @@
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+;; (use-package undo-tree
+;;   :ensure t
+;;   :init (global-undo-tree-mode))
+
 (use-package undo-tree
   :ensure t
-  :init (global-undo-tree-mode))
+  :init (global-undo-tree-mode)
+  :after hydra
+  :hydra (hydra-undo-tree (:hint nil)
+  "
+  _p_: undo  _n_: redo _s_: save _l_: load   "
+  ("p"   undo-tree-undo)
+  ("n"   undo-tree-redo)
+  ("s"   undo-tree-save-history)
+  ("l"   undo-tree-load-history)
+  ("u"   undo-tree-visualize "visualize" :color blue)
+  ("q"   nil "quit" :color blue))
+  :bind
+  (("C-x C-h u" . hydra-undo-tree/body)))
+
+(global-set-key (kbd "C-x u") 'hydra-undo-tree/body)
+(global-set-key (kbd "C-/") 'hydra-undo-tree/undo-tree-undo)
 
 ;; sml-mode -- smart mode line
 (use-package smart-mode-line
@@ -302,12 +362,11 @@
 (use-package google-this
   :ensure t
   :init
-  (google-this-mode 1))
+  (google-this-mode))
 
-(use-package smooth-scroll
+(use-package good-scroll
   :ensure t
-  :config
-  (smooth-scroll-mode))
+  :init (good-scroll-mode))
 
 ;; SSH remote
 ;; (defun connect-homeserver ()

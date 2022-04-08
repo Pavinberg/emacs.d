@@ -129,5 +129,8 @@
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
+(add-hook 'markdown-mode-hook (lambda ()
+						   (keyboard-translate ?· ?`)))
+
 (provide 'init-preload-local)
 ;;; init-preload-local.el ends here

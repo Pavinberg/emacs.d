@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-(setq python-shell-interpreter "python3")
+(setq python-shell-interpreter "~/miniconda3/bin/python3")
 (setenv "WORKON_HOME" "/Users/pavin/miniconda3/envs")
 ;; (pyvenv-mode t)
 

@@ -9,10 +9,14 @@
  '(ivy-mode t)
  '(ivy-use-virtual-buffers t)
  '(package-selected-packages
-   '(embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode smooth-scroll pdf-tools auctex))
+   '(dirvish good-scroll use-package-hydra embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode pdf-tools auctex))
  '(ring-bell-function 'ignore)
  '(safe-local-variable-values
-   '((c-file-style . gnu)
+   '((flycheck-clang-include-path list
+								  (concat "-I"
+										  (projectile-project-root)
+										  "build/include"))
+	 (c-file-style . gnu)
 	 (flycheck-clang-include-path list
 								  (concat "-I"
 										  (projectile-project-root)
