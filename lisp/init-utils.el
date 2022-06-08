@@ -71,6 +71,7 @@
       (browse-url (concat "file://" file-name)))))
 
 (defun copy-whole-line ()
+  "Copy the whole line."
   (interactive)
   (save-excursion
     (back-to-indentation)
@@ -78,6 +79,14 @@
      (point)
      (line-end-position)))
   (message "1 line copied"))
+
+(defun file-name-only ()
+  "Get the current buffer file name without directory."
+  (file-name-nondirectory (buffer-name)))
+
+(defun file-name-only-noext ()
+  "Get the currennt buffer file name without directory and extension."
+  (file-name-sans-extension (file-name-only)))
 
 ;; Faster move cursor
 (defun next-ten-lines()

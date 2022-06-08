@@ -82,6 +82,9 @@
 ;; lisp-mode
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-region)
 
+;; hippie
+(global-set-key (kbd "M-/") 'hippie-expand)
+
 ;; shell remove escape characters
 (defun preamble-regexp-alternatives (regexps)
   "Return the alternation of a list of regexps."

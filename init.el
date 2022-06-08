@@ -113,15 +113,12 @@
   :bind (:map minibuffer-local-map
 			  ("M-A" . marginalia-cycle)))
 
-;; (use-package hydra
-;;   :ensure t)
-
 (use-package exec-path-from-shell
+  :if (memq window-system '(mac ns))
   :ensure t
   :init
-  (when (memq window-system '(mac ns x))
-	(setq exec-path-from-shell-arguments nil)
-	(exec-path-from-shell-initialize)))
+  (setq exec-path-from-shell-arguments nil)
+  (exec-path-from-shell-initialize))
 
 (use-package ace-window
   :ensure t
@@ -132,6 +129,9 @@
   :bind
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
+
+(use-package tiny
+  :ensure t)
 
 (use-package company
   :ensure t
@@ -148,9 +148,10 @@
   :ensure t
   :hook (company-mode . company-box-mode))
 
-;; (use-package company-tabnine
-;;   :ensure t
-;;   :init (add-to-list 'company-backends #'company-tabnine))
+(use-package company-tabnine
+  :disabled
+  :ensure t
+  :init (add-to-list 'company-backends #'company-tabnine))
 
 (use-package flycheck
   :ensure t
@@ -159,10 +160,6 @@
   (prog-mode . flycheck-mode)
   (c++-mode-hook . (lambda () (setq flycheck-clang-language-standard "c++17"))))
 
-(use-package yasnippet
-  :ensure t
-  :init (yas-global-mode))
-
 (use-package dashboard
   :ensure t
   :diminish dashboard-mode
@@ -170,17 +167,19 @@
   (setq dashboard-banner-logo-title "Coding is happening")
   (setq dashboard-projects-backend 'projectile)
   (setq dashboard-startup-banner 'official)
-  (setq dashboard-items '((recents  . 5)
+  (setq dashboard-items '((recents  . 8)
 						  (bookmarks . 5)
 						  (projects . 10)))
-  (dashboard-setup-startup-hook) ;; TODO some bug here
-  )
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (dashboard-setup-startup-hook))
 
 (use-package projectile
   :ensure t
   :bind (("C-c p" . projectile-command-map))
   :config
   (setq projectile-mode-line "Projectile")
+  (setq projectile-track-known-projects-automatically nil)
   (defadvice projectile-project-root (around ignore-remote first activate)
 	(unless (file-remote-p default-directory) ad-do-it)))
 
@@ -201,10 +200,10 @@
   :defer t)
 
 (defun enable-lsp-if-not-remote ()
-  (unless (file-remote-p default-directory) (lsp)))
+  (unless (file-remote-p default-directory) (lsp-deferred)))
 
 
-;; lisp-mode
+;; lsp-mode
 (use-package lsp-mode
   :ensure t
   :init
@@ -212,27 +211,26 @@
   (setq lsp-keymap-prefix "C-c l"
 		lsp-file-watch-threshold 500)
   ;; lsp-prefer-flymake nil)
-  :hook ((c-mode . enable-lsp-if-not-remote)
-		 (c++-mode . enable-lsp-if-not-remote)
-		 (python-mode . enable-lsp-if-not-remote)
-		 (rust-mode . enable-lsp-if-not-remote)
-		 ;; if you want which-key integration
-		 (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp
+  :hook
+  (lsp-mode . lsp-enable-which-key-integration) ; which-key integration
+  :commands (lsp lsp-deferred)
+  :config
+  (setq lsp-completion-provider :none)
+  (setq lsp-headerline-breadcrumb-enable t))
+  ; :commands lsp
   ;; :config
   ;; (lsp-register-client
   ;;  (make-lsp-client :new-connection (lsp-tramp-connection "pyls")
   ;; 					:major-modes '(python-mode)
   ;; 					:remote? t
   ;; 					:server-id 'pyls-remote))
-  :custom (lsp-headerline-breadcrumb-enable t))
 
 (use-package lsp-ui
   :ensure t
   :config
   (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
   (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-  (setq lsp-ui-doc-position 'at-point))
+  (setq lsp-ui-doc-position 'top))
 
 (use-package lsp-ivy
   :ensure t
@@ -240,14 +238,63 @@
 
 (use-package dap-mode
   :ensure t
+  :after hydra lsp-mode
   :commands dap-debug
+  :custom
+  (dap-auto-configure-mode t)
   :config
-  (require 'dap-gdb-lldb)
-  (dap-ui-mode 1))
+  (dap-ui-mode 1)
+  :hydra
+  (hydra-dap-mode
+   (:color pink :hint nil :foreign-keys run)
+   "
+^Stepping^          ^Switch^                 ^Breakpoints^         ^Debug^                     ^Eval
+^^^^^^^^----------------------------------------------------------------------------------------------------------------
+_n_: Next           _ss_: Session            _bb_: Toggle          _dd_: Debug                 _ee_: Eval
+_i_: Step in        _st_: Thread             _bd_: Delete          _dr_: Debug recent          _er_: Eval region
+_o_: Step out       _sf_: Stack frame        _ba_: Add             _dl_: Debug last            _es_: Eval thing at point
+_c_: Continue       _su_: Up stack frame     _bc_: Set condition   _de_: Edit debug template   _ea_: Add expression.
+_r_: Restart frame  _sd_: Down stack frame   _bh_: Set hit count   _ds_: Debug restart
+_Q_: Disconnect     _sl_: List locals        _bl_: Set log message
+                  _sb_: List breakpoints
+                  _sS_: List sessions
+"
+   ("n" dap-next)
+   ("i" dap-step-in)
+   ("o" dap-step-out)
+   ("c" dap-continue)
+   ("r" dap-restart-frame)
+   ("ss" dap-switch-session)
+   ("st" dap-switch-thread)
+   ("sf" dap-switch-stack-frame)
+   ("su" dap-up-stack-frame)
+   ("sd" dap-down-stack-frame)
+   ("sl" dap-ui-locals)
+   ("sb" dap-ui-breakpoints)
+   ("sS" dap-ui-sessions)
+   ("bb" dap-breakpoint-toggle)
+   ("ba" dap-breakpoint-add)
+   ("bd" dap-breakpoint-delete)
+   ("bc" dap-breakpoint-condition)
+   ("bh" dap-breakpoint-hit-condition)
+   ("bl" dap-breakpoint-log-message)
+   ("dd" dap-debug)
+   ("dr" dap-debug-recent)
+   ("ds" dap-debug-restart)
+   ("dl" dap-debug-last)
+   ("de" dap-debug-edit-template)
+   ("ee" dap-eval)
+   ("ea" dap-ui-expressions-add)
+   ("er" dap-eval-region)
+   ("es" dap-eval-thing-at-point)
+   ("q" nil "quit" :color blue)
+   ("Q" dap-disconnect :color red)))
 
 (use-package treemacs
   :ensure t
   :defer t
+  :config
+  (treemacs-tag-follow-mode)
   :bind
   (:map global-map
         ("M-0"       . treemacs-select-window)
@@ -255,7 +302,9 @@
         ("C-x t t"   . treemacs)
         ("C-x t B"   . treemacs-bookmark)
         ;; ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
+        ("C-x t M-t" . treemacs-find-tag))
+  (:map treemacs-mode-map
+		("/" . treemacs-advanced-helpful-hydra)))
 
 (use-package treemacs-projectile
   :ensure t
@@ -265,14 +314,30 @@
   :ensure t
   :after (treemacs lsp))
 
-(use-package rust-mode
-  :ensure t
-  :bind ("C-c C-c" . rust-run))
+(use-package magit
+  :ensure t)
 
-;; Add keybindings for interacting with Cargo
-(use-package cargo
+(use-package yasnippet
   :ensure t
-  :hook (rust-mode . cargo-minor-mode))
+  :init
+  (yas-global-mode)
+  :config
+  (defun company-mode/backend-with-yas (backend)
+	(if (and (listp backend) (member 'company-yasnippet backend))
+		backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+  ;; unbind <TAB> completion
+  (define-key yas-minor-mode-map [(tab)]        nil)
+  (define-key yas-minor-mode-map (kbd "TAB")    nil)
+  (define-key yas-minor-mode-map (kbd "<tab>")  nil)
+  :bind
+  (:map yas-minor-mode-map ("S-<tab>" . yas-expand)))
+
+(use-package yasnippet-snippets
+  :ensure t
+  :after yasnippet)
 
 (use-package which-key
   :ensure t
@@ -294,35 +359,37 @@
   :bind
   (("C-x C-h m" . hydra-multiple-cursors/body)
    ("C-S-<mouse-1>" . mc/toggle-cursor-on-click))
-  :hydra (hydra-multiple-cursors
-		  (:hint nil)
-		  "
+  :hydra
+  (hydra-multiple-cursors
+   (:hint nil)
+   "
 Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cursor%s(if (> (mc/num-cursors) 1) \"s\" \"\")
 ------------------------------------------------------------------
  [_p_]   Prev     [_n_]   Next     [_l_] Edit lines  [_0_] Insert numbers
  [_P_]   Skip     [_N_]   Skip     [_a_] Mark all    [_A_] Insert letters
  [_M-p_] Unmark   [_M-n_] Unmark   [_s_] Search      [_q_] Quit
  [_|_] Align with input CHAR       [Click] Cursor at point"
-		  ("l" mc/edit-lines :exit t)
-		  ("a" mc/mark-all-like-this :exit t)
-		  ("n" mc/mark-next-like-this)
-		  ("N" mc/skip-to-next-like-this)
-		  ("M-n" mc/unmark-next-like-this)
-		  ("p" mc/mark-previous-like-this)
-		  ("P" mc/skip-to-previous-like-this)
-		  ("M-p" mc/unmark-previous-like-this)
-		  ("|" mc/vertical-align)
-		  ("s" mc/mark-all-in-region-regexp :exit t)
-		  ("0" mc/insert-numbers :exit t)
-		  ("A" mc/insert-letters :exit t)
-		  ("<mouse-1>" mc/add-cursor-on-click)
-		  ;; Help with click recognition in this hydra
-		  ("<down-mouse-1>" ignore)
-		  ("<drag-mouse-1>" ignore)
-		  ("q" nil)))
+   ("l" mc/edit-lines :exit t)
+   ("a" mc/mark-all-like-this :exit t)
+   ("n" mc/mark-next-like-this)
+   ("N" mc/skip-to-next-like-this)
+   ("M-n" mc/unmark-next-like-this)
+   ("p" mc/mark-previous-like-this)
+   ("P" mc/skip-to-previous-like-this)
+   ("M-p" mc/unmark-previous-like-this)
+   ("|" mc/vertical-align)
+   ("s" mc/mark-all-in-region-regexp :exit t)
+   ("0" mc/insert-numbers :exit t)
+   ("A" mc/insert-letters :exit t)
+   ("<mouse-1>" mc/add-cursor-on-click)
+   ;; Help with click recognition in this hydra
+   ("<down-mouse-1>" ignore)
+   ("<drag-mouse-1>" ignore)
+   ("q" nil)))
 
 ;; Python
-(require 'init-python)
+;; (require 'init-python)
+(require 'init-programming)
 
 ;; rainbow delimiters
 (use-package rainbow-delimiters
@@ -367,6 +434,7 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 (use-package good-scroll
   :ensure t
   :init (good-scroll-mode))
+
 
 ;; SSH remote
 ;; (defun connect-homeserver ()

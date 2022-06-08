@@ -13,9 +13,9 @@
 
 ;;; Standard package repositories
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
-;; (setq url-proxy-services '(("no_proxy" . "^\\(192\\.168\\..*\\)")
-;;                            ("http" . "localhost:10108")
-;; 						   ("https" . "localhost:10108")))
+(setq url-proxy-services '(("no_proxy" . "^\\(192\\.168\\..*\\)")
+                           ("http" . "localhost:10108")
+						   ("https" . "localhost:10108")))
 (setq package-archives '(("gnu-mir"   . "http://mirrors.cloud.tencent.com/elpa/gnu/")
                          ("melpa-mir" . "http://mirrors.cloud.tencent.com/elpa/melpa/")))
 ;; (add-to-list 'package-archives '("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/") t)
