@@ -9,10 +9,14 @@
  '(ivy-mode t)
  '(ivy-use-virtual-buffers t)
  '(package-selected-packages
-   '(pyvenv-mode pyvenv lsp-pyright tiny yasnippet-snippets dirvish good-scroll use-package-hydra embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode pdf-tools auctex))
+   '(cmake-mode clang-format sphinx-doc pyvenv-mode pyvenv lsp-pyright tiny yasnippet-snippets dirvish good-scroll use-package-hydra embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode pdf-tools auctex))
  '(ring-bell-function 'ignore)
  '(safe-local-variable-values
-   '((py-indent-offset . 4)
+   '((flycheck-clang-include-path list
+								  (concat "-I"
+										  (projectile-project-root)
+										  "build/include/"))
+	 (py-indent-offset . 4)
 	 (flycheck-clang-include-path list concat "-I"
 								  (projectile-project-root)
 								  "include")

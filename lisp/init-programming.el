@@ -12,12 +12,18 @@
   (c++-mode . lsp-deferred)
   (c++-mode . c-toggle-hungry-state))
 
+(use-package clang-format
+  :ensure t)
+
+(use-package cmake-mode
+  :ensure t)
+
 ;; debug
 (use-package dap-cpptools
   :after dap-mode)
 
 (use-package dap-lldb
-  :disabled
+  ;:disabled
   :after dap-mode
   :config
   (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
@@ -56,6 +62,10 @@
   (setenv "WORKON_HOME" "~/miniconda3/envs")
   ;; (setq python-shell-interpreter "python3")
   (pyvenv-mode t))
+
+(use-package sphinx-doc
+  :hook
+  (python-mode . (sphinx-doc-mode t)))
 
 ;; Rust
 (use-package rust-mode

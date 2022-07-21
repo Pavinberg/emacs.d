@@ -24,3 +24,5 @@ site-lisp/package/
 amx-items
 .extension/
 .dap-breakpoints
+transient/
+projects

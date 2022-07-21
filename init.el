@@ -64,6 +64,7 @@
   :bind
   (("C-s" . 'swiper)
    ("C-x b" . 'ivy-switch-buffer)
+   ("C-x C-b" . 'ivy-switch-buffer)
    ("C-c v" . 'ivy-push-view)
    ("C-c s" . 'ivy-switch-view)
    ("C-c V" . 'ivy-pop-view)
@@ -102,10 +103,13 @@
           (embark-act))
       (select-window
        (cdr (ring-ref avy-ring 0))))
-	t)
+	t)  
   (setf (alist-get ?e avy-dispatch-alist) 'avy-action-embark)
   :bind
-  (("C-j C-SPC" . avy-goto-char-timer)))
+  (("C-j C-SPC" . avy-goto-char-timer)
+   ("C-j C-k" . avy-move-line)
+   ("C-j C-l" . avy-copy-line)
+   ("C-j C-i" . avy-copy-region)))
 
 (use-package marginalia
   :ensure t
@@ -320,7 +324,10 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
 (use-package yasnippet
   :ensure t
   :init
-  (yas-global-mode)
+  ;; (yas-global-mode)
+  (yas-reload-all)
+  :hook
+  (prog-mode . yas-minor-mode)
   :config
   (defun company-mode/backend-with-yas (backend)
 	(if (and (listp backend) (member 'company-yasnippet backend))
@@ -448,3 +455,4 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 (provide 'init)
 
 ;;; init.el ends here
+(put 'dired-find-alternate-file 'disabled nil)

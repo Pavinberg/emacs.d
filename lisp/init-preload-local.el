@@ -53,8 +53,6 @@
 (global-set-key (kbd "M-w") 'kill-region)
 (global-set-key (kbd "C-w") 'kill-ring-save)
 (global-set-key (kbd "C-c '") 'comment-or-uncomment-region)
-(global-set-key (kbd "C-j C-k") 'kill-whole-line)
-(global-set-key (kbd "C-j C-l") 'copy-whole-line)
 (global-set-key (kbd "C-a") 'back-to-indentation) ;; swap C-a and M-m
 (global-set-key (kbd "M-m") 'move-beginning-of-line)
 ;;(global-set-key (kbd "H-k") 'kill-buffer)

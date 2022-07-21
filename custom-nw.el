@@ -8,6 +8,11 @@
  '(line-number-mode t)
  '(package-selected-packages
    '(exec-path-from-shell gnu-elpa-keyring-update fullframe seq yaml-mode auto-complete flycheck-rust rust-mode sml-mode projectile org magit slime flycheck avy rainbow-delimiters multiple-cursors))
+ '(safe-local-variable-values
+   '((flycheck-clang-include-path list
+								  (concat "-I"
+										  (projectile-project-root)
+										  "build"))))
  '(sml/no-confirm-load-theme t))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
