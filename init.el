@@ -39,8 +39,7 @@
   ;; (add-to-list 'load-path "elpa/use-package-2.4.1/")
   (require 'use-package))
 
-(require 'init-latex)
-(require 'init-iterm)
+;; (require 'init-latex)
 ;; (require 'init-chinese-word-segment)
 ;; ===========================================
 ;; Basic Customization (in init-preload-local)
@@ -50,6 +49,9 @@
   :ensure t)
 
 (use-package use-package-hydra
+  :ensure t)
+
+(use-package counsel
   :ensure t)
 
 (use-package ivy
@@ -103,7 +105,7 @@
           (embark-act))
       (select-window
        (cdr (ring-ref avy-ring 0))))
-	t)  
+	t)
   (setf (alist-get ?e avy-dispatch-alist) 'avy-action-embark)
   :bind
   (("C-j C-SPC" . avy-goto-char-timer)
@@ -150,6 +152,7 @@
 
 (use-package company-box
   :ensure t
+  :if window-system
   :hook (company-mode . company-box-mode))
 
 (use-package company-tabnine
@@ -160,6 +163,8 @@
 (use-package flycheck
   :ensure t
   ;; :init (global-flycheck-mode)
+  :config
+  (setq truncate-lines nil)
   :hook
   (prog-mode . flycheck-mode)
   (c++-mode-hook . (lambda () (setq flycheck-clang-language-standard "c++17"))))
@@ -433,6 +438,9 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   ; (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
   (sml/setup))
 
+(when *is-a-mac*
+  (require 'init-iterm))
+
 (use-package google-this
   :ensure t
   :init
@@ -440,8 +448,10 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 
 (use-package good-scroll
   :ensure t
+  :if window-system
   :init (good-scroll-mode))
 
+(put 'dired-find-alternate-file 'disabled nil)
 
 ;; SSH remote
 ;; (defun connect-homeserver ()
@@ -455,4 +465,3 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 (provide 'init)
 
 ;;; init.el ends here
-(put 'dired-find-alternate-file 'disabled nil)

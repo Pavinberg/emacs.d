@@ -10,7 +10,9 @@
   :hook
   (c-mode . lsp-deferred)
   (c++-mode . lsp-deferred)
-  (c++-mode . c-toggle-hungry-state))
+  (c++-mode . c-toggle-hungry-state)
+  :bind
+  ("C-c o" . ff-find-other-file))
 
 (use-package clang-format
   :ensure t)
@@ -92,6 +94,17 @@
   :hook
   (rust-mode . cargo-minor-mode))
 
+;; For ns-3
+(load-file "~/.emacs.d/mymode/ns3-mode.el")
+(require 'ns3-mode)
+
+;; Print ANSI colors in compilation mode buffer
+(ignore-errors
+  (require 'ansi-color)
+  (defun my-colorize-compilation-buffer ()
+    (when (eq major-mode 'compilation-mode)
+      (ansi-color-apply-on-region compilation-filter-start (point-max))))
+  (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
 
 (provide 'init-programming)
 ;;; init-programming.el ends here

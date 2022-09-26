@@ -12,7 +12,18 @@
    '(cmake-mode clang-format sphinx-doc pyvenv-mode pyvenv lsp-pyright tiny yasnippet-snippets dirvish good-scroll use-package-hydra embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode pdf-tools auctex))
  '(ring-bell-function 'ignore)
  '(safe-local-variable-values
-   '((flycheck-clang-include-path list
+   '((eval dap-register-debug-template "NS3::Debug"
+		   (list :type "lldb-vscode" :cwd
+				 (projectile-project-root)
+				 :request "launch" :program
+				 (lambda nil
+				   (read-file-name "Select file to debug: "))
+				 :name "NS3::Debug"))
+	 (eval dap-register-debug-template "NS3::Debug"
+		   (list :type "lldb-vscode" :cwd
+				 (projectile-project-root)
+				 :request "launch" :program "build/scratch/ns3.36.1-dumbell-debug" :name "NS3::Debug"))
+	 (flycheck-clang-include-path list
 								  (concat "-I"
 										  (projectile-project-root)
 										  "build/include/"))
