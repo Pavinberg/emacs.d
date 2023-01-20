@@ -12,7 +12,8 @@
   (c++-mode . lsp-deferred)
   (c++-mode . c-toggle-hungry-state)
   :bind
-  ("C-c o" . ff-find-other-file))
+  ("C-c o" . ff-find-other-file)
+  ("C-c 4 o" . ff-find-other-file-other-window))
 
 (use-package clang-format
   :ensure t)
@@ -45,7 +46,7 @@
 (use-package python
   :defer t
   :mode ("\\.py\\'" . python-mode)
-  :interpreter ("python3" . python-mode)
+  :interpreter ("~/miniconda3/bin/python3" . python-mode)
   :config
   ;; for debug
   (require 'dap-python))

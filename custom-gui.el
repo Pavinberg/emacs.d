@@ -9,7 +9,7 @@
  '(ivy-mode t)
  '(ivy-use-virtual-buffers t)
  '(package-selected-packages
-   '(cmake-mode clang-format sphinx-doc pyvenv-mode pyvenv lsp-pyright tiny yasnippet-snippets dirvish good-scroll use-package-hydra embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode pdf-tools auctex))
+   '(sphinx-doc csv-mode queue cider cmake-mode clang-format pyvenv-mode pyvenv lsp-pyright tiny yasnippet-snippets dirvish good-scroll use-package-hydra embark marginalia exec-path-from-shell gnu-elpa-keyring-update fullframe seq google-this amx dap-mode projectile-ripgrep dashboard rainbow-mode pdf-tools auctex))
  '(ring-bell-function 'ignore)
  '(safe-local-variable-values
    '((eval dap-register-debug-template "NS3::Debug"

@@ -39,8 +39,8 @@
   ;; (add-to-list 'load-path "elpa/use-package-2.4.1/")
   (require 'use-package))
 
-;; (require 'init-latex)
-;; (require 'init-chinese-word-segment)
+(require 'init-latex)
+(require 'init-chinese-word-segment)
 ;; ===========================================
 ;; Basic Customization (in init-preload-local)
 ;; ===========================================
@@ -200,10 +200,6 @@
 ;; slime
 (setq inferior-lisp-program "sbcl")
 
-(use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p))
-
 (use-package yaml-mode
   :ensure t
   :defer t)
@@ -251,22 +247,20 @@
   :commands dap-debug
   :custom
   (dap-auto-configure-mode t)
-  :config
-  (dap-ui-mode 1)
   :hydra
-  (hydra-dap-mode
+  (dap-hydra
    (:color pink :hint nil :foreign-keys run)
    "
-^Stepping^          ^Switch^                 ^Breakpoints^         ^Debug^                     ^Eval
-^^^^^^^^----------------------------------------------------------------------------------------------------------------
-_n_: Next           _ss_: Session            _bb_: Toggle          _dd_: Debug                 _ee_: Eval
+^Stepping^          ^Switch^                 ^Breakpoints^         ^Debug^                     ^Eval^                      
+^^^^^^^^---------------------------------------------------------------------------------------------------------------
+_n_: Next           _ss_: Session            _bb_: Toggle          _dd_: Debug                 _ee_: Eval                  
 _i_: Step in        _st_: Thread             _bd_: Delete          _dr_: Debug recent          _er_: Eval region
 _o_: Step out       _sf_: Stack frame        _ba_: Add             _dl_: Debug last            _es_: Eval thing at point
 _c_: Continue       _su_: Up stack frame     _bc_: Set condition   _de_: Edit debug template   _ea_: Add expression.
 _r_: Restart frame  _sd_: Down stack frame   _bh_: Set hit count   _ds_: Debug restart
 _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
                   _sb_: List breakpoints
-                  _sS_: List sessions
+                  _se_: List expressions
 "
    ("n" dap-next)
    ("i" dap-step-in)
@@ -280,7 +274,7 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
    ("sd" dap-down-stack-frame)
    ("sl" dap-ui-locals)
    ("sb" dap-ui-breakpoints)
-   ("sS" dap-ui-sessions)
+   ("se" dap-ui-expressions)
    ("bb" dap-breakpoint-toggle)
    ("ba" dap-breakpoint-add)
    ("bd" dap-breakpoint-delete)
@@ -297,7 +291,13 @@ _Q_: Disconnect     _sl_: List locals        _bl_: Set log message
    ("er" dap-eval-region)
    ("es" dap-eval-thing-at-point)
    ("q" nil "quit" :color blue)
-   ("Q" dap-disconnect :color red)))
+   ("Q" dap-disconnect "Disconnect" :color blue))
+  :config
+  (dap-ui-mode 1)
+  (defun dap-hydra ()
+	(interactive)
+	"Run `dap-hydra/body'."
+	(dap-hydra/body)))
 
 (use-package treemacs
   :ensure t
@@ -436,7 +436,14 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   :ensure t
   :init
   ; (setq sml/no-confirm-load-theme t)  ; avoid asking when startup
-  (sml/setup))
+  (sml/setup)
+  :config
+  (setq rm-blacklist
+		(format "^ \\(%s\\)$"
+				(mapconcat #'identity
+                           '("Projectile.*" "company.*" "Google"
+							 "Undo-Tree" "counsel" "ivy" "yas" "WK")
+                           "\\|"))))
 
 (when *is-a-mac*
   (require 'init-iterm))

@@ -81,7 +81,7 @@
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-region)
 
 ;; hippie
-(global-set-key (kbd "M-/") 'hippie-expand)
+(global-set-key (kbd "C-<tab>") 'hippie-expand)
 
 ;; shell remove escape characters
 (defun preamble-regexp-alternatives (regexps)
