@@ -2,6 +2,8 @@
 ;;; Commentary:
 ;;; Code:
 
+(setq confirm-kill-emacs #'yes-or-no-p)
+
 (setq-default tab-width 4)
 (electric-pair-mode t)
 (add-hook 'prog-mode-hook #'show-paren-mode)
@@ -126,6 +128,8 @@
 
 (add-hook 'comint-output-filter-functions
           'filter-non-sgr-control-sequences-in-output)
+
+(put 'dired-find-alternate-file 'disabled nil)
 
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

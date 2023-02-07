@@ -39,8 +39,6 @@
   ;; (add-to-list 'load-path "elpa/use-package-2.4.1/")
   (require 'use-package))
 
-(require 'init-latex)
-(require 'init-chinese-word-segment)
 ;; ===========================================
 ;; Basic Customization (in init-preload-local)
 ;; ===========================================
@@ -221,7 +219,9 @@
   :commands (lsp lsp-deferred)
   :config
   (setq lsp-completion-provider :none)
-  (setq lsp-headerline-breadcrumb-enable t))
+  (setq lsp-headerline-breadcrumb-enable t)
+  :bind
+  ("C-c l s" . lsp-ivy-workspace-symbol))
   ; :commands lsp
   ;; :config
   ;; (lsp-register-client
@@ -446,19 +446,17 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
                            "\\|"))))
 
 (when *is-a-mac*
-  (require 'init-iterm))
-
-(use-package google-this
-  :ensure t
-  :init
-  (google-this-mode))
-
-(use-package good-scroll
-  :ensure t
-  :if window-system
-  :init (good-scroll-mode))
-
-(put 'dired-find-alternate-file 'disabled nil)
+  (require 'init-latex)
+  (require 'init-chinese-word-segment)
+  (require 'init-iterm)
+  (use-package google-this
+	:ensure t
+	:init
+	(google-this-mode))
+  (use-package good-scroll
+	:ensure t
+	:if window-system
+	:init (good-scroll-mode)))
 
 ;; SSH remote
 ;; (defun connect-homeserver ()
