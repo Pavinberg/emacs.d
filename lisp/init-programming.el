@@ -25,14 +25,15 @@
 (use-package dap-cpptools
   :after dap-mode)
 
-(use-package dap-lldb
-  ;:disabled
-  :after dap-mode
-  :config
-  (setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
-  ;; ask user for executable to debug if not specified explicitly (c++)
-  (setq dap-lldb-debugged-program-function
-		(lambda () (read-file-name "Select file to debug: "))))
+(when *is-a-mac*
+  (use-package dap-lldb
+										;:disabled
+	:after dap-mode
+	:config
+	(setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
+	;; ask user for executable to debug if not specified explicitly (c++)
+	(setq dap-lldb-debugged-program-function
+		  (lambda () (read-file-name "Select file to debug: "))))
   ;; default debug template for (c++)
   ;; (dap-register-debug-template
   ;;  "LLDB:vscode"
@@ -41,6 +42,7 @@
   ;;        :args nil
   ;;        :request "launch"
   ;;        :program nil)))
+  )
 
 ;; Python
 (use-package python
@@ -51,6 +53,15 @@
   ;; for debug
   (require 'dap-python))
 
+(use-package pyvenv
+  :ensure t
+  :config
+  (setenv "WORKON_HOME" (expand-file-name "~/miniconda3/envs"))
+  ;; (setq python-shell-interpreter "python3")
+  (pyvenv-mode t)
+  :hook
+  (python-mode . (lambda () (pyvenv-workon ".."))))
+
 (use-package lsp-pyright
   :ensure t
   :config
@@ -58,17 +69,6 @@
   (python-mode . (lambda ()
 				   (require 'lsp-pyright)
 				   (lsp-deferred))))
-
-(use-package pyvenv
-  :ensure t
-  :config
-  (setenv "WORKON_HOME" "~/miniconda3/envs")
-  ;; (setq python-shell-interpreter "python3")
-  (pyvenv-mode t))
-
-(use-package sphinx-doc
-  :hook
-  (python-mode . (sphinx-doc-mode t)))
 
 ;; Rust
 (use-package rust-mode
@@ -96,7 +96,7 @@
   (rust-mode . cargo-minor-mode))
 
 ;; For ns-3
-(load-file "~/.emacs.d/mymode/ns3-mode.el")
+(load-file (expand-file-name "~/.emacs.d/mymode/ns3-mode.el"))
 (require 'ns3-mode)
 
 ;; Print ANSI colors in compilation mode buffer
@@ -106,6 +106,12 @@
     (when (eq major-mode 'compilation-mode)
       (ansi-color-apply-on-region compilation-filter-start (point-max))))
   (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer))
+
+(defun shell-other-window ()
+  "Open shell in other window."
+  (interactive)
+  (other-window 1)
+  (shell))
 
 (provide 'init-programming)
 ;;; init-programming.el ends here
