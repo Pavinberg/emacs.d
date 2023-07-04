@@ -13,7 +13,8 @@
   (c++-mode . c-toggle-hungry-state)
   :bind
   ("C-c o" . ff-find-other-file)
-  ("C-c 4 o" . ff-find-other-file-other-window))
+  ;; ("C-c o" . ff-find-other-file-other-window)
+)
 
 (use-package clang-format
   :ensure t)
@@ -29,11 +30,11 @@
   (use-package dap-lldb
 										;:disabled
 	:after dap-mode
-	:config
-	(setq dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
+	:custom
+	(dap-lldb-debug-program '("/usr/local/opt/llvm/bin/lldb-vscode"))
 	;; ask user for executable to debug if not specified explicitly (c++)
-	(setq dap-lldb-debugged-program-function
-		  (lambda () (read-file-name "Select file to debug: "))))
+	(dap-lldb-debugged-program-function
+	 (lambda () (read-file-name "Select file to debug: "))))
   ;; default debug template for (c++)
   ;; (dap-register-debug-template
   ;;  "LLDB:vscode"
@@ -74,18 +75,18 @@
 (use-package rust-mode
   :ensure t
   :functions dap-register-debug-template
-  :bind
-  ("C-c C-c" . rust-run)
+  ;; :bind
+  ;; ("C-c C-c" . rust-run)
   :hook
   (rust-mode . lsp-deferred)
   :config
   ;; debug
   (require 'dap-gdb-lldb)
   (dap-register-debug-template "Rust::LLDB Run Configuration"
-                               (list :type "lldb"
+                               (list :type "lldb-vscode"
 									 :request "launch"
 									 :name "rust-lldb::Run"
-									 :gdbpath "rust-lldb"
+									 ;; :gdbpath "rust-lldb"
 									 :target nil
 									 :cwd nil)))
 
@@ -96,8 +97,8 @@
   (rust-mode . cargo-minor-mode))
 
 ;; For ns-3
-(load-file (expand-file-name "~/.emacs.d/mymode/ns3-mode.el"))
-(require 'ns3-mode)
+;; (load-file (expand-file-name "~/.emacs.d/mymode/ns3-mode.el"))
+;; (require 'ns3-mode)
 
 ;; Print ANSI colors in compilation mode buffer
 (ignore-errors

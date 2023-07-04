@@ -1,4 +1,4 @@
-;;; package --- Summary
+;;; init.el --- Init Emacs frome here
 ;;; Commentary:
 ;;; This file bootstraps the configuration, which is divided into
 ;;; a number of other files.
@@ -43,6 +43,14 @@
 ;; Basic Customization (in init-preload-local)
 ;; ===========================================
 
+(use-package helpful
+  :ensure t
+  :bind
+  ("C-h f" . 'helpful-callable)
+  ("C-h v" . 'helpful-variable)
+  ("C-h k" . 'helpful-key)
+  ("C-h x" . 'helpful-command))
+
 (use-package hydra
   :ensure t)
 
@@ -57,10 +65,10 @@
   :init
   (ivy-mode 1)
   (counsel-mode 1)
-  :config
-  (setq ivy-use-virtual-buffers t)
-  (setq search-default-mode #'char-fold-to-regexp)
-  (setq ivy-count-format "(%d/%d) ")
+  :custom
+  (ivy-use-virtual-buffers t)
+  (search-default-mode #'char-fold-to-regexp)
+  (ivy-count-format "(%d/%d) ")
   :bind
   (("C-s" . 'swiper)
    ("C-x b" . 'ivy-switch-buffer)
@@ -128,13 +136,106 @@
   :ensure t
   :bind (("C-x o" . 'ace-window)))
 
+(use-package meow
+  :ensure t
+  :init
+  (defun meow-setup ()
+  (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  (meow-motion-overwrite-define-key
+   '("j" . meow-next)
+   '("k" . meow-prev)
+   '("<escape>" . ignore))
+  (meow-leader-define-key
+   ;; SPC j/k will run the original command in MOTION state.
+   '("j" . "H-j")
+   '("k" . "H-k")
+   ;; Use SPC (0-9) for digit arguments.
+   '("1" . meow-digit-argument)
+   '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument)
+   '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument)
+   '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument)
+   '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument)
+   '("0" . meow-digit-argument)
+   '("/" . meow-keypad-describe-key)
+   '("?" . meow-cheatsheet))
+  (meow-normal-define-key
+   '("0" . meow-expand-0)
+   '("9" . meow-expand-9)
+   '("8" . meow-expand-8)
+   '("7" . meow-expand-7)
+   '("6" . meow-expand-6)
+   '("5" . meow-expand-5)
+   '("4" . meow-expand-4)
+   '("3" . meow-expand-3)
+   '("2" . meow-expand-2)
+   '("1" . meow-expand-1)
+   '("-" . negative-argument)
+   '(";" . meow-reverse)
+   '("," . meow-inner-of-thing)
+   '("." . meow-bounds-of-thing)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   '("a" . meow-append)
+   '("A" . meow-open-below)
+   '("b" . meow-back-word)
+   '("B" . meow-back-symbol)
+   '("c" . meow-change)
+   '("d" . meow-delete)
+   '("D" . meow-backward-delete)
+   '("e" . meow-next-word)
+   '("E" . meow-next-symbol)
+   '("f" . meow-find)
+   '("g" . meow-cancel-selection)
+   '("G" . meow-grab)
+   '("h" . meow-left)
+   '("H" . meow-left-expand)
+   '("i" . meow-insert)
+   '("I" . meow-open-above)
+   '("j" . meow-next)
+   '("J" . meow-next-expand)
+   '("k" . meow-prev)
+   '("K" . meow-prev-expand)
+   '("l" . meow-right)
+   '("L" . meow-right-expand)
+   '("m" . meow-join)
+   '("n" . meow-search)
+   '("o" . meow-block)
+   '("O" . meow-to-block)
+   '("p" . meow-yank)
+   ; '("q" . meow-quit)
+   '("Q" . meow-goto-line)
+   '("r" . meow-replace)
+   '("R" . meow-swap-grab)
+   '("s" . meow-kill)
+   '("t" . meow-till)
+   '("u" . meow-undo)
+   '("U" . meow-undo-in-selection)
+   '("v" . meow-visit)
+   '("w" . meow-mark-word)
+   '("W" . meow-mark-symbol)
+   '("x" . meow-line)
+   '("X" . meow-goto-line)
+   '("y" . meow-save)
+   '("Y" . meow-sync-grab)
+   '("z" . meow-pop-selection)
+   '("'" . repeat)
+   '("<escape>" . ignore)))
+  :config
+  (meow-setup)
+  (meow-global-mode 1)
+  (setq delete-active-region t))
+
 (use-package mwim
   :ensure t
   :bind
   ("C-a" . mwim-beginning-of-code-or-line)
   ("C-e" . mwim-end-of-code-or-line))
 
-(use-package tiny
+(use-package tiny ; m1\n10|int func%02d ()
   :ensure t)
 
 (use-package company
@@ -310,7 +411,8 @@
 
 (use-package dap-mode
   :ensure t
-  :after hydra lsp-mode
+  :after lsp-mode
+  :init (add-to-list 'image-types 'svg)
   :commands dap-debug
   :custom
   (dap-auto-configure-mode t)
@@ -469,6 +571,7 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
 ;; Python
 ;; (require 'init-python)
 (require 'init-programming)
+(require 'init-org)
 
 ;; rainbow delimiters
 (use-package rainbow-delimiters
@@ -493,7 +596,9 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   ("u"   undo-tree-visualize "visualize" :color blue)
   ("q"   nil "quit" :color blue))
   :bind
-  (("C-x C-h u" . hydra-undo-tree/body)))
+  (("C-x C-h u" . hydra-undo-tree/body))
+  :custom
+  (undo-tree-auto-save-history nil))
 
 (global-set-key (kbd "C-x u") 'hydra-undo-tree/body)
 (global-set-key (kbd "C-/") 'hydra-undo-tree/undo-tree-undo)
@@ -516,14 +621,18 @@ Up^^             Down^^           Miscellaneous           % 2(mc/num-cursors) cu
   (require 'init-latex)
   (require 'init-chinese-word-segment)
   (require 'init-iterm)
-  (use-package google-this
-	:ensure t
-	:init
-	(google-this-mode))
   (use-package good-scroll
 	:ensure t
 	:if window-system
 	:init (good-scroll-mode)))
+
+(when *is-a-mac*
+  (use-package chatgpt-shell
+	:custom
+	((chatgpt-shell-openai-key
+      (lambda ()
+		;; Here the openai-key should be the proxy service key.
+		(pv/osx-get-keychain-password "openai key"))))))
 
 ;; SSH remote
 ;; (defun connect-homeserver ()

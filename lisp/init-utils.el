@@ -145,5 +145,13 @@
 
 		  (if this-win-2nd (other-window 1))))))
 
+(when *is-a-mac*
+  (defun pv/osx-get-keychain-password (account-name)
+	"Gets ACCOUNT-NAME keychain password from OS X Keychain."
+	(let ((cmd (concat "security 2>&1 >/dev/null find-generic-password -ga '" account-name "'")))
+	  (let ((passwd (shell-command-to-string cmd)))
+		(when (string-match (rx "\"" (group (0+ (or (1+ (not (any "\"" "\\"))) (seq "\\" anything)))) "\"") passwd)
+		  (match-string 1 passwd))))))
+
 (provide 'init-utils)
 ;;; init-utils.el ends here
